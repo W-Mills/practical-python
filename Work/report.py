@@ -16,6 +16,9 @@ def read_portfolio(filename):
       try:
         # holding = { 'name': row[0], 'shares':int(row[1]), 'price': float(row[2]) }
         holding = dict(zip(headers, row))
+        holding['shares'] = int(holding['shares'])
+        holding['price'] = float(holding['price'])
+
         portfolio.append(holding)
       except IndexError:
         print(f'Line {row_num}: Error reading portfolio, index unavailable for:', row)
@@ -33,24 +36,6 @@ def read_prices(filename):
       except IndexError:
         print(f'Line {row_num}: Error reading prices, index unavailable for:', row)
   return prices
-
-# def portfolio_value_difference(portfolio_file, prices_file):
-#   portfolio = read_portfolio(portfolio_file)
-#   prices = read_prices(prices_file)
-#   initial_portfolio_value = 0.0
-#   current__portfolio_value = 0.0
-
-#   for holding in portfolio:
-#     try:
-#       initial_portfolio_value += holding['shares'] * holding['price']
-#       current_stock_price = float(prices[holding['name']])
-#       current__portfolio_value += holding['shares'] * current_stock_price
-#     except KeyError:
-#       print('KeyError while calculating value difference for holding:', holding)
-
-#   return current__portfolio_value - initial_portfolio_value
-
-# print('Value difference: $', round(portfolio_value_difference('Data/portfolio.csv', 'Data/prices.csv'), 2))
 
 def make_report(portfolio, prices):
   items = []
@@ -70,8 +55,8 @@ def make_report(portfolio, prices):
 
 # Read data files and create the report data
 
-# portfolio = read_portfolio('Data/portfolio.csv')
-portfolio = read_portfolio('Data/portfoliodate.csv')
+portfolio = read_portfolio('Data/portfolio.csv')
+# portfolio = read_portfolio('Data/portfoliodate.csv')
 prices = read_prices('Data/prices.csv')
 report = make_report(portfolio, prices)
 
@@ -85,4 +70,4 @@ print(('-' * 10 + ' ') * len(headers))
 
 for r in report:
   name, shares, price, change = r
-  print(f"{name:>10s} {shares:>10s} {'$' + str(price):>10s} {change:>10.2f}")
+  print(f"{name:>10s} {shares:>10d} {'$' + str(price):>10s} {change:>10.2f}")
