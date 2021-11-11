@@ -26,29 +26,62 @@ def read_prices(filename):
 
   with open(filename, 'rt') as f:
     rows = csv.reader(f)
-    headers = next(rows)
-
     for row in rows:
       try:
-        prices[row[0]] = row[1]
+        prices[row[0]] = float(row[1])
       except IndexError:
         print('Error reading prices, index unavailable for:', row)
   return prices
 
-def portfolio_value_difference(portfolio_file, prices_file):
-  portfolio = read_portfolio(portfolio_file)
-  prices = read_prices(prices_file)
-  initial_portfolio_value = 0.0
-  current__portfolio_value = 0.0
+# def portfolio_value_difference(portfolio_file, prices_file):
+#   portfolio = read_portfolio(portfolio_file)
+#   prices = read_prices(prices_file)
+#   initial_portfolio_value = 0.0
+#   current__portfolio_value = 0.0
 
-  for holding in portfolio:
+#   for holding in portfolio:
+#     try:
+#       initial_portfolio_value += holding['shares'] * holding['price']
+#       current_stock_price = float(prices[holding['name']])
+#       current__portfolio_value += holding['shares'] * current_stock_price
+#     except KeyError:
+#       print('KeyError while calculating value difference for holding:', holding)
+
+#   return current__portfolio_value - initial_portfolio_value
+
+# print('Value difference: $', round(portfolio_value_difference('Data/portfolio.csv', 'Data/prices.csv'), 2))
+
+def make_report(portfolio, prices):
+  items = []
+  
+  for s in portfolio:
     try:
-      initial_portfolio_value += holding['shares'] * holding['price']
-      current_stock_price = float(prices[holding['name']])
-      current__portfolio_value += holding['shares'] * current_stock_price
+      current_price = prices[s['name']]
     except KeyError:
-      print('KeyError while calculating value difference for holding:', holding)
+      print('KeyError accessing current price for stock', s)
+      pass
+    
+    price_difference = current_price - s['price']
+    t = (s['name'], s['shares'], current_price, price_difference)
 
-  return current__portfolio_value - initial_portfolio_value
+    items.append(t)
+    
+  return items
 
-print('Value difference: $', round(portfolio_value_difference('Data/portfolio.csv', 'Data/prices.csv'), 2))
+# Read data files and create the report data
+
+portfolio = read_portfolio('Data/portfolio.csv')
+prices = read_prices('Data/prices.csv')
+report = make_report(portfolio, prices)
+
+# Output the report
+
+headers = ('Name', 'Shares', 'Price', 'Change')
+print('%10s %10s %10s %10s' % headers)
+print(('-' * 10 + ' ') * len(headers))
+# space = ' '
+# print(f'{space:-<10} {space:-<10} {space:-<10} {space:-<10}')
+
+for r in report:
+  name, shares, price, change = r
+  print(f"{name:>10s} {shares:>10d} {'$' + str(price):>10s} {change:>10.2f}")
