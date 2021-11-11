@@ -5,7 +5,9 @@
 import csv
 
 def read_portfolio(filename):
-  '''Reads a portfolio, converts each holding into a dictionary and returns the collection'''
+  '''
+  Reads a portfolio, converts each holding into a dictionary and returns the collection
+  '''
   portfolio = []
 
   with open(filename, 'rt') as f:
@@ -25,7 +27,9 @@ def read_portfolio(filename):
   return portfolio
 
 def read_prices(filename):
-  '''Reads prices, converts each key value into a dictionary and returns the collection'''
+  '''
+  Reads prices, converts each key value into a dictionary and returns the collection
+  '''
   prices = {}
 
   with open(filename, 'rt') as f:
@@ -38,6 +42,9 @@ def read_prices(filename):
   return prices
 
 def make_report(portfolio, prices):
+  '''
+  Creates report that includes price change for each stock in a portfolio given a prices list
+  '''
   items = []
   
   for s in portfolio:
@@ -53,21 +60,24 @@ def make_report(portfolio, prices):
     
   return items
 
-# Read data files and create the report data
+def print_report(report):
+  '''
+  Outputs report in a pretty tabular way
+  '''
 
-portfolio = read_portfolio('Data/portfolio.csv')
-# portfolio = read_portfolio('Data/portfoliodate.csv')
-prices = read_prices('Data/prices.csv')
-report = make_report(portfolio, prices)
+  headers = ('Name', 'Shares', 'Price', 'Change')
+  print('%10s %10s %10s %10s' % headers)
+  print(('-' * 10 + ' ') * len(headers))
 
-# Output the report
+  for r in report:
+    name, shares, price, change = r
+    print(f"{name:>10s} {shares:>10d} {'$' + str(price):>10s} {change:>10.2f}")
 
-headers = ('Name', 'Shares', 'Price', 'Change')
-print('%10s %10s %10s %10s' % headers)
-print(('-' * 10 + ' ') * len(headers))
-# space = ' '
-# print(f'{space:-<10} {space:-<10} {space:-<10} {space:-<10}')
+def portfolio_report(portfolio_file, prices_file):
+  '''
+  Reads data files, creates report data and prints it
+  '''
+  report = make_report(read_portfolio(portfolio_file), read_prices(prices_file))
+  print_report(report)
 
-for r in report:
-  name, shares, price, change = r
-  print(f"{name:>10s} {shares:>10d} {'$' + str(price):>10s} {change:>10.2f}")
+portfolio_report('Data/portfolio.csv', 'Data/prices.csv')
