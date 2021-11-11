@@ -32,14 +32,14 @@ def portfolio_cost(filename):
     rows = csv.reader(file)
     headers = next(rows)
 
-    for row in rows:
+    for row_num, row in enumerate(rows, start=1):
+      record = dict(zip(headers, row))
       try:
-        # row = line.split(',')
-        cost = float(row[2])
-        quantity = int(row[1])
-        total += (cost * quantity)
+        num_shares = int(record['shares'])
+        price_shares = float(record['price'])
+        total += (price_shares * num_shares)
       except ValueError:
-        print('Cannot parse value for line', row)
+        print(f"Row {row_num}: Couldn't convert: {row}")
 
   return total
 
@@ -49,8 +49,8 @@ def portfolio_cost(filename):
 if len(sys.argv) == 2:
   filename = sys.argv[1]
 else:
-  # filename = '/Users/wmills/codes/practical-python/Work/Data/missing.csv'
-  filename = 'non-existent path'
+  filename = '/Users/wmills/codes/practical-python/Work/Data/missing.csv'
+  # filename = 'non-existent path'
 
 cost = portfolio_cost(filename)
 print('Total cost:', cost)
