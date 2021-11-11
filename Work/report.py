@@ -1,45 +1,19 @@
 # report.py
-#
-# Exercise 2.4
 
-import csv
+import fileparse
 
 def read_portfolio(filename):
   '''
   Reads a portfolio, converts each holding into a dictionary and returns the collection
   '''
-  portfolio = []
-
-  with open(filename, 'rt') as f:
-    rows = csv.reader(f)
-    headers = next(rows)
-
-    for row_num, row in enumerate(rows, start=1):
-      try:
-        # holding = { 'name': row[0], 'shares':int(row[1]), 'price': float(row[2]) }
-        holding = dict(zip(headers, row))
-        holding['shares'] = int(holding['shares'])
-        holding['price'] = float(holding['price'])
-
-        portfolio.append(holding)
-      except IndexError:
-        print(f'Line {row_num}: Error reading portfolio, index unavailable for:', row)
-  return portfolio
+  return fileparse.parse_csv(filename, types=[str,int,float])
 
 def read_prices(filename):
   '''
   Reads prices, converts each key value into a dictionary and returns the collection
   '''
-  prices = {}
-
-  with open(filename, 'rt') as f:
-    rows = csv.reader(f)
-    for row_num, row in enumerate(rows, start=1):
-      try:
-        prices[row[0]] = float(row[1])
-      except IndexError:
-        print(f'Line {row_num}: Error reading prices, index unavailable for:', row)
-  return prices
+  prices = fileparse.parse_csv(filename, has_headers=False, types=[str, float])
+  return dict(prices)
 
 def make_report(portfolio, prices):
   '''
@@ -77,7 +51,18 @@ def portfolio_report(portfolio_file, prices_file):
   '''
   Reads data files, creates report data and prints it
   '''
-  report = make_report(read_portfolio(portfolio_file), read_prices(prices_file))
+  portfolio = read_portfolio(portfolio_file)
+  prices = read_prices(prices_file)
+  report = make_report(portfolio, prices)
   print_report(report)
 
-portfolio_report('Data/portfolio.csv', 'Data/prices.csv')
+def main(args):
+  if len(args) != 3:
+    raise SystemExit('Usage: %s portfolio_file prices_file' % args[0])
+  portfolio_report(args[1], args[2])
+
+if __name__ == '__main__':
+  import sys
+  main(sys.argv)
+
+# portfolio_report('Data/portfolio.csv', 'Data/prices.csv')
